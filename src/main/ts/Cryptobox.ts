@@ -203,13 +203,10 @@ export class Cryptobox extends EventEmitter {
    * Saving the session takes automatically place when the session is used to encrypt or decrypt a message.
    */
   public session_from_prekey(session_id: string, pre_key_bundle: ArrayBuffer): Promise<CryptoboxSession> {
-    const cachedSession: CryptoboxSession = this.load_session_from_cache(session_id);
-    if (cachedSession) {
-      return Promise.resolve(cachedSession);
-    }
+    return this.session_load(session_id)
+      .catch(sessionLoadError => {
+        this.logger.warn(`Creating new session because session with ID "${session_id}" could not be loaded: ${sessionLoadError.message}`);
 
-    return Promise.resolve()
-      .then(() => {
         let bundle: Proteus.keys.PreKeyBundle;
 
         try {
