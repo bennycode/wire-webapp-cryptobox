@@ -1,4 +1,4 @@
-/*! wire-webapp-cryptobox v6.2.0 */
+/*! wire-webapp-cryptobox v6.2.1 */
 var cryptobox =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -80,21 +80,6 @@ module.exports = Proteus;
 
 "use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
-var RecordAlreadyExistsError_1 = __webpack_require__(13);
-exports.RecordAlreadyExistsError = RecordAlreadyExistsError_1.default;
-var RecordNotFoundError_1 = __webpack_require__(14);
-exports.RecordNotFoundError = RecordNotFoundError_1.default;
-var RecordTypeError_1 = __webpack_require__(15);
-exports.RecordTypeError = RecordTypeError_1.default;
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -123,6 +108,21 @@ exports.DecryptionError = DecryptionError;
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var RecordAlreadyExistsError_1 = __webpack_require__(13);
+exports.RecordAlreadyExistsError = RecordAlreadyExistsError_1.default;
+var RecordNotFoundError_1 = __webpack_require__(14);
+exports.RecordNotFoundError = RecordNotFoundError_1.default;
+var RecordTypeError_1 = __webpack_require__(15);
+exports.RecordTypeError = RecordTypeError_1.default;
+
+
+/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -145,10 +145,9 @@ var EventEmitter = __webpack_require__(20);
 var LRUCache = __webpack_require__(25);
 var error_1 = __webpack_require__(6);
 var CryptoboxSession_1 = __webpack_require__(4);
-var DecryptionError_1 = __webpack_require__(2);
+var DecryptionError_1 = __webpack_require__(1);
 var InvalidPreKeyFormatError_1 = __webpack_require__(5);
 var ReadOnlyStore_1 = __webpack_require__(7);
-var error_2 = __webpack_require__(1);
 var Cryptobox = (function (_super) {
     __extends(Cryptobox, _super);
     function Cryptobox(cryptoBoxStore, minimumAmountOfPreKeys) {
@@ -293,12 +292,9 @@ var Cryptobox = (function (_super) {
     };
     Cryptobox.prototype.session_from_prekey = function (session_id, pre_key_bundle) {
         var _this = this;
-        var cachedSession = this.load_session_from_cache(session_id);
-        if (cachedSession) {
-            return Promise.resolve(cachedSession);
-        }
-        return Promise.resolve()
-            .then(function () {
+        return this.session_load(session_id)
+            .catch(function (sessionLoadError) {
+            
             var bundle;
             try {
                 bundle = Proteus.keys.PreKeyBundle.deserialise(pre_key_bundle);
@@ -310,13 +306,6 @@ var Cryptobox = (function (_super) {
                 .then(function (session) {
                 var cryptobox_session = new CryptoboxSession_1.CryptoboxSession(session_id, _this.pk_store, session);
                 return _this.session_save(cryptobox_session);
-            })
-                .catch(function (error) {
-                if (error instanceof error_2.RecordAlreadyExistsError) {
-                    
-                    return _this.session_load(session_id);
-                }
-                throw error;
             });
         });
     };
@@ -464,7 +453,7 @@ Cryptobox.prototype.VERSION = __webpack_require__(23).version;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Proteus = __webpack_require__(0);
-var DecryptionError_1 = __webpack_require__(2);
+var DecryptionError_1 = __webpack_require__(1);
 var CryptoboxSession = (function () {
     function CryptoboxSession(id, pk_store, session) {
         this.id = id;
@@ -720,7 +709,7 @@ exports.default = Cache;
 /* WEBPACK VAR INJECTION */(function(Buffer) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Proteus = __webpack_require__(0);
-var error_1 = __webpack_require__(1);
+var error_1 = __webpack_require__(2);
 var SerialisedRecord_1 = __webpack_require__(8);
 var CryptoboxCRUDStore = (function () {
     function CryptoboxCRUDStore(engine) {
@@ -874,7 +863,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Proteus = __webpack_require__(0);
 var dexie_1 = __webpack_require__(24);
 
-var error_1 = __webpack_require__(1);
+var error_1 = __webpack_require__(2);
 var SerialisedRecord_1 = __webpack_require__(8);
 var IndexedDB = (function () {
     function IndexedDB(identifier) {
@@ -1247,10 +1236,10 @@ var CryptoboxCRUDStore_1 = __webpack_require__(10);
 var Cryptobox_1 = __webpack_require__(3);
 var error_1 = __webpack_require__(6);
 var CryptoboxSession_1 = __webpack_require__(4);
-var DecryptionError_1 = __webpack_require__(2);
+var DecryptionError_1 = __webpack_require__(1);
 var InvalidPreKeyFormatError_1 = __webpack_require__(5);
 var ReadOnlyStore_1 = __webpack_require__(7);
-var error_2 = __webpack_require__(1);
+var error_2 = __webpack_require__(2);
 module.exports = {
     Cryptobox: Cryptobox_1.Cryptobox,
     CryptoboxSession: CryptoboxSession_1.CryptoboxSession,
@@ -3688,7 +3677,7 @@ module.exports = {
 		"test:rerun": "gulp test"
 	},
 	"types": "dist/typings/wire-webapp-cryptobox.d.ts",
-	"version": "6.2.0"
+	"version": "6.2.1"
 };
 
 /***/ }),
