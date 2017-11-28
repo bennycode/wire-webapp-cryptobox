@@ -232,15 +232,33 @@ describe('cryptobox.store.IndexedDB', function() {
           expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
           return alice.load_session_from_cache(sessionId);
         })
-        .then(function(cryptoboxSession) {
+        .then(cryptoboxSession => {
           expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
-          // Check if code is robust and can handle a second call
           return alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
         })
         .then(function(cryptoboxSession) {
           expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
-          // Remove local cache and reinforce a session from PreKey
-          alice.cachedSessions = new LRUCache(1);
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it('reinforces a session from the indexedDB without cache', function(done) {
+      const alice = new cryptobox.Cryptobox(new cryptobox.store.IndexedDB('alice_db'), 1);
+      const sessionId = 'session_with_bob';
+
+      const bob = Proteus.keys.IdentityKeyPair.new();
+      const preKey = Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
+      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
+
+      alice.create()
+        .then(function(allPreKeys) {
+          expect(allPreKeys.length).toBe(1);
+          return alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
+        })
+        .then(function(cryptoboxSession) {
+          expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
+          alice.cachedSessions = new window.LRUCache(1);
           return alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
         })
         .then(function(cryptoboxSession) {

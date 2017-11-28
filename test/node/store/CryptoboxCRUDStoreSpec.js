@@ -19,6 +19,7 @@
 
 const cryptobox = require('../../../dist/commonjs/wire-webapp-cryptobox');
 const fs = require('fs-extra');
+const LRUCache = require('wire-webapp-lru-cache');
 const path = require('path');
 const Proteus = require('wire-webapp-proteus');
 const {FileEngine} = require('@wireapp/store-engine/dist/commonjs/engine');
@@ -150,6 +151,61 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
           done();
         })
         .catch((error) => done.fail(error));
+    });
+  });
+
+  describe('session_from_prekey', function() {
+    it('saves and caches a valid session from a serialized PreKey bundle', function(done) {
+      const alice = new cryptobox.Cryptobox(fileStore, 1);
+      const sessionId = 'session_with_bob';
+
+      const bob = Proteus.keys.IdentityKeyPair.new();
+      const preKey = Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
+      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
+
+      alice.create()
+        .then(allPreKeys => {
+          expect(allPreKeys.length).toBe(1);
+          return alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
+        })
+        .then(cryptoboxSession => {
+          expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
+          return alice.load_session_from_cache(sessionId);
+        })
+        .then(cryptoboxSession => {
+          expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
+          return alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
+        })
+        .then(cryptoboxSession => {
+          expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it('reinforces a session from the store without cache', function(done) {
+      const alice = new cryptobox.Cryptobox(fileStore, 1);
+      const sessionId = 'session_with_bob';
+
+      const bob = Proteus.keys.IdentityKeyPair.new();
+      const preKey = Proteus.keys.PreKey.new(Proteus.keys.PreKey.MAX_PREKEY_ID);
+      const bobPreKeyBundle = Proteus.keys.PreKeyBundle.new(bob.public_key, preKey);
+
+      alice.create()
+        .then(allPreKeys => {
+          expect(allPreKeys.length).toBe(1);
+          return alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
+        })
+        .then(cryptoboxSession => {
+          expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
+          alice.cachedSessions = new LRUCache(1);
+          return alice.session_from_prekey(sessionId, bobPreKeyBundle.serialise());
+        })
+        .then(cryptoboxSession => {
+          expect(cryptoboxSession.fingerprint_remote()).toBe(bob.public_key.fingerprint());
+          done();
+        })
+        .catch(done.fail);
     });
   });
 });

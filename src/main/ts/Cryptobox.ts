@@ -219,14 +219,6 @@ export class Cryptobox extends EventEmitter {
           .then((session: Proteus.session.Session) => {
             const cryptobox_session = new CryptoboxSession(session_id, this.pk_store, session);
             return this.session_save(cryptobox_session);
-          })
-          .catch((error: Error) => {
-            if (error instanceof RecordAlreadyExistsError) {
-              this.logger.warn(error.message, error);
-              return this.session_load(session_id);
-            }
-
-            throw error;
           });
       });
   }
