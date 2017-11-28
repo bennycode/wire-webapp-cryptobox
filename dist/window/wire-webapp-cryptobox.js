@@ -3657,6 +3657,11 @@ module.exports = {
 		"webpack": "2.3.3",
 		"yargs": "7.0.2"
 	},
+	"files": [
+		"dist/commonjs",
+		"dist/typings",
+		"dist/window"
+	],
 	"license": "GPL-3.0",
 	"main": "dist/commonjs/wire-webapp-cryptobox.js",
 	"name": "wire-webapp-cryptobox",
