@@ -3622,7 +3622,7 @@ module.exports = g;
 
 module.exports = {
 	"dependencies": {
-		"@wireapp/store-engine": "0.1.0",
+		"@wireapp/store-engine": "0.1.1",
 		"dexie": "1.5.1",
 		"fs-extra": "3.0.1",
 		"rimraf": "2.6.1",
@@ -3673,7 +3673,7 @@ module.exports = {
 		"dist": "gulp dist --env production",
 		"lint": "echo \"No linting specified\" && exit 0",
 		"preversion": "yarn lint && yarn dist && yarn test",
-		"version": "gulp build_ts_browser && git add dist/**/*",
+		"version": "gulp build_ts_browser && git add dist/{typings,window,index.html,index.js}",
 		"postversion": "git push && git push --tags",
 		"start": "gulp",
 		"test": "gulp test",

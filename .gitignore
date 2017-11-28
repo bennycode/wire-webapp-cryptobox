@@ -8,11 +8,8 @@
 !/.idea/watcherTasks.xml
 
 /bower_components
-/dist
-!/dist/typings
-!/dist/window
-!/dist/index.html
-!/dist/index.js
+/dist/commonjs
+/dist/lib
 /node_modules
 /test/node/store/test
 /typings
