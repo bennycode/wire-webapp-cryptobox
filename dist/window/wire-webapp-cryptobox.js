@@ -3673,7 +3673,7 @@ module.exports = {
 		"dist": "gulp dist --env production",
 		"lint": "echo \"No linting specified\" && exit 0",
 		"preversion": "yarn lint && yarn dist && yarn test",
-		"version": "gulp build_ts_browser && git add dist/{typings,window,index.html,index.js}",
+		"version": "gulp build_ts_browser && git add dist/",
 		"postversion": "git push && git push --tags",
 		"start": "gulp",
 		"test": "gulp test",
